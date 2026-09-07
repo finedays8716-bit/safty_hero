@@ -318,6 +318,37 @@ const THEMES={
   },
 };
 
+
+/* ===================== 간단 효과음(Web Audio, 별도 파일 없음) ===================== */
+let _audioCtx=null;
+function getAudioCtx(){
+  if(!_audioCtx){
+    const AC=window.AudioContext||window.webkitAudioContext;
+    if(AC) _audioCtx=new AC();
+  }
+  if(_audioCtx && _audioCtx.state==='suspended') _audioCtx.resume();
+  return _audioCtx;
+}
+function tone(freq,start,dur,vol=0.06,type='sine'){
+  const ac=getAudioCtx(); if(!ac) return;
+  const o=ac.createOscillator(), g=ac.createGain();
+  o.type=type; o.frequency.value=freq;
+  g.gain.setValueAtTime(0.0001,ac.currentTime+start);
+  g.gain.exponentialRampToValueAtTime(vol,ac.currentTime+start+0.01);
+  g.gain.exponentialRampToValueAtTime(0.0001,ac.currentTime+start+dur);
+  o.connect(g); g.connect(ac.destination);
+  o.start(ac.currentTime+start); o.stop(ac.currentTime+start+dur+0.02);
+}
+function playCorrectSound(){
+  tone(523.25,0.00,0.16,0.055,'sine');
+  tone(659.25,0.11,0.18,0.060,'sine');
+  tone(783.99,0.23,0.24,0.065,'sine');
+}
+function playWrongSound(){
+  tone(220,0.00,0.12,0.045,'triangle');
+  tone(174.61,0.10,0.16,0.040,'triangle');
+}
+
 /* ===================== 상태 ===================== */
 let curKey=null, idx=0, curChoices=[];
 const game=document.getElementById('game');
@@ -431,8 +462,9 @@ function renderQuestion(){
 /* ===================== 선택 ===================== */
 function pick(i){
   const c=curChoices[i];
-  if(c.correct){ renderAnswer(); }
+  if(c.correct){ playCorrectSound(); renderAnswer(); }
   else{
+    playWrongSound();
     const el=document.querySelector(`.choice[data-i="${i}"]`);
     if(el){el.classList.add('shake');setTimeout(()=>el.classList.remove('shake'),400);}
     const p=document.getElementById('popup'),card=document.getElementById('card');
@@ -449,10 +481,13 @@ function renderAnswer(){
   const num=String(idx+1).padStart(2,'0');
   const aImg=`${T.prefix}_${num}_a.webp`;
   const last=s.isFinal;
+  const correctFx=['🎉','✨','🎊','⭐','🎈','💫'].map((c,i)=>`<span class="confetti" style="left:${8+i*16}%;animation-delay:${i*.18}s">${c}</span>`).join('');
   game.innerHTML=`
     ${topbarHTML(T)}
+    ${correctFx}
     <div class="stage answer" style="background:linear-gradient(180deg,#fff7d6,#ffe9a8)">
       <span class="ph-label">🖼 ${aImg} — 정답 장면</span>
+      <div style="position:absolute;left:16px;top:16px;z-index:6;background:#ff7a00;color:#fff;border-radius:999px;padding:8px 14px;font-family:'CookieRun';font-size:18px;box-shadow:0 4px 0 #d85f00;">정답! 🎉</div>
       <img class="scene-img" src="${IMG_PATH}${aImg}" alt="" onload="this.closest('.stage').classList.add('has-img')" onerror="this.style.display='none'">
       <div class="hero">${s.aHero||s.hero}</div>
       ${s.aExtra?`<div class="extra" style="top:18px;right:26px">${s.aExtra}</div>`:''}
