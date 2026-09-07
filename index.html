@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🦸 안전 히어로 - 대피 스토리 게임</title>
+<style>
+  /* 쿠키런(타이틀) */
+  @font-face{font-family:'CookieRun';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_twelve@1.0/CookieRunOTF-Bold00.woff') format('woff');font-weight:700;font-display:swap;}
+  @font-face{font-family:'CookieRun';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/CookieRun-Regular.woff') format('woff');font-weight:400;font-display:swap;}
+  /* 롯데마트 드림체(본문) */
+  @font-face{font-family:'LotteMartDream';src:url('https://cdn.jsdelivr.net/korean-webfonts/1/corps/lottemart/LotteMartDream/LotteMartDreamBold.woff2') format('woff2');font-weight:700;font-display:swap;}
+  @font-face{font-family:'LotteMartDream';src:url('https://cdn.jsdelivr.net/korean-webfonts/1/corps/lottemart/LotteMartDream/LotteMartDreamMedium.woff2') format('woff2');font-weight:400;font-display:swap;}
+  @font-face{font-family:'LotteMartDream';src:url('https://cdn.jsdelivr.net/korean-webfonts/1/corps/lottemart/LotteMartDream/LotteMartDreamLight.woff2') format('woff2');font-weight:300;font-display:swap;}
+  :root{--ink:#3a2e1f;--cream:#fffaf2;--green:#2ecc71;--green-d:#27ae60;--blue:#4aa3ff;--blue-d:#2d7fd6;}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{font-family:'LotteMartDream',sans-serif;color:var(--ink);min-height:100vh;display:flex;
+    align-items:center;justify-content:center;padding:14px;overflow:hidden;transition:background .4s;
+    background-size:cover;background-position:center;background-repeat:no-repeat;}
+  /* 배경을 은은하게 — 위에 옅은 흰 막 */
+  body::before{content:"";position:fixed;inset:0;background:rgba(255,255,255,.45);z-index:0;pointer-events:none;}
+  /* 테마 배경색(그라데이션) - 배경 이미지는 게임판 안 무대에서만 사용 */
+  body.t-home{background:radial-gradient(circle at 25% 15%,#cdeaff 0,transparent 45%),radial-gradient(circle at 80% 85%,#ffe0c2 0,transparent 45%),#eaf6ff;}
+  body.t-fire{background:radial-gradient(circle at 20% 15%,#ffe6c2 0,transparent 45%),radial-gradient(circle at 85% 80%,#ffd6b0 0,transparent 45%),#fff4e0;}
+  body.t-quake{background:radial-gradient(circle at 20% 15%,#e8e0d0 0,transparent 45%),radial-gradient(circle at 85% 80%,#d8cdb8 0,transparent 45%),#f3ede0;}
+  body.t-dust{background:radial-gradient(circle at 20% 15%,#dbe4ea 0,transparent 45%),radial-gradient(circle at 85% 80%,#cdd8de 0,transparent 45%),#eef2f4;}
+
+  .game{width:100%;max-width:920px;max-height:96vh;background:var(--cream);border:6px solid #fff;border-radius:32px;
+    box-shadow:0 14px 0 rgba(120,90,40,.22),0 22px 44px rgba(0,0,0,.18);padding:18px 22px;position:relative;z-index:1;
+    display:flex;flex-direction:column;overflow:hidden;}
+
+  /* 메인 */
+  .home{text-align:center;padding:10px 4px;display:flex;flex-direction:column;justify-content:center;height:100%;}
+  .home h1{font-family:'CookieRun';font-weight:700;font-size:26px;color:#e85d1f;line-height:1.4;margin-bottom:16px;}
+
+  /* 캐릭터 소개 영역 (가로 3열) */
+  .char-intro{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:18px;}
+  .char-card{display:flex;flex-direction:column;align-items:center;gap:8px;background:#fff;border-radius:20px;
+    padding:16px 10px;box-shadow:0 4px 0 #f0e2cf;text-align:center;}
+  .char-face{width:72px;height:72px;border-radius:50%;flex-shrink:0;display:flex;
+    align-items:center;justify-content:center;font-size:40px;overflow:hidden;border:3px solid #fff;}
+  .char-face img{width:100%;height:100%;object-fit:cover;}
+  .cf-fire{background:#ffe1cf;}
+  .cf-quake{background:#ece0c8;}
+  .cf-dust{background:#dce8ee;}
+  .char-text .nm{font-family:'CookieRun';font-size:18px;display:flex;align-items:center;justify-content:center;gap:4px;}
+  .char-text .ro{font-size:12px;color:#7a6a55;line-height:1.35;margin-top:4px;}
+
+  /* 긴 미션 버튼 */
+  .home-sub{font-size:15px;color:#9a7a55;margin-bottom:12px;}
+  .theme-grid{display:flex;flex-direction:column;gap:13px;}
+  .theme-btn{font-family:'CookieRun';border:none;border-radius:20px;padding:16px 18px;cursor:pointer;color:#fff;
+    display:flex;align-items:center;gap:14px;text-align:left;transition:transform .08s;}
+  .theme-btn:active{transform:translateY(4px);}
+  .theme-btn .emo{font-size:34px;flex-shrink:0;}
+  .theme-btn .bt{flex:1;}
+  .theme-btn .bt b{font-size:18px;display:block;line-height:1.3;}
+  .theme-btn .bt small{display:block;font-size:13.5px;opacity:.95;font-weight:normal;margin-top:3px;}
+  .tb-fire{background:#ff7a3d;box-shadow:0 6px 0 #e85d1f;}
+  .tb-quake{background:#b78b4e;box-shadow:0 6px 0 #97703a;}
+  .tb-dust{background:#7d97a8;box-shadow:0 6px 0 #5f7888;}
+
+  /* 상단바 */
+  .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+  .home-btn{background:#fff;border:3px solid #e6d6b8;border-radius:14px;font-family:'CookieRun';
+    font-size:14px;padding:6px 12px;cursor:pointer;color:#97703a;}
+  .badge{color:#fff;font-size:15px;padding:6px 14px;border-radius:999px;}
+  .progress{display:flex;gap:5px;}
+  .dot{width:13px;height:13px;border-radius:50%;background:#ece0c8;border:3px solid #fff;transition:.3s;}
+  .dot.done{background:var(--green);}
+
+  /* 무대 — 16:9, 그림 안 잘리게 전체 표시 */
+  .stage{position:relative;width:100%;aspect-ratio:16/9;max-height:60vh;border-radius:22px;overflow:hidden;
+    margin:0 auto 12px;border:none;display:flex;align-items:center;justify-content:center;
+    background:#fdf6ea;flex-shrink:0;transition:background .4s;}
+  .stage .ph-label{position:absolute;top:8px;left:10px;font-size:11px;color:#8a6b40;
+    background:rgba(255,255,255,.78);padding:2px 8px;border-radius:8px;z-index:3;}
+  /* 그림: 잘리지 않게 전체 표시 */
+  .stage .scene-img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:1;background:#fdf6ea;}
+  .hero{font-size:84px;filter:drop-shadow(0 8px 6px rgba(0,0,0,.2));animation:bob 1.6s ease-in-out infinite;z-index:2;}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+  .extra{position:absolute;font-size:44px;z-index:2;}
+  .stage.has-img .hero,.stage.has-img .extra,.stage.has-img .ph-label{display:none;}
+  .stage.dark .hero,.stage.dark .extra{filter:brightness(.5) saturate(.6);}
+  .stage.shaking{animation:quake .22s infinite;}
+  @keyframes quake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}60%{transform:translateX(7px)}80%{transform:translateX(-4px)}}
+  .stage.answer{border-style:solid;border-color:#ffd84a;box-shadow:inset 0 0 0 4px #fff3b0;}
+
+  /* 이야기 텍스트 박스 */
+  .story{background:#fff;border-radius:16px;padding:13px 16px;font-size:19px;line-height:1.5;
+    box-shadow:0 4px 0 #ece0c8;margin-bottom:11px;display:flex;align-items:flex-start;gap:8px;flex-shrink:0;}
+  .story .ico{font-size:22px;flex-shrink:0;margin-top:2px;}
+  .story b{color:#e0641a;}
+
+  /* 선택지 — 남는 공간 채우되 한 화면 유지 */
+  .choices{display:flex;flex-direction:column;gap:10px;}
+  .choice{font-family:'CookieRun';font-size:18px;border:none;border-radius:16px;padding:13px 16px;cursor:pointer;
+    color:#fff;transition:transform .08s,box-shadow .08s;text-align:left;display:flex;align-items:center;gap:12px;line-height:1.3;}
+  .choice:active{transform:translateY(4px);}
+  .choice .cemo{font-size:28px;flex-shrink:0;width:40px;text-align:center;}
+  .choice.shake{animation:shake .4s;}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+
+  /* 정답화면 다음 버튼 */
+  .next-wrap{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;}
+  .prev-btn{font-family:'CookieRun';font-size:18px;border:none;border-radius:18px;padding:14px 28px;color:#fff;
+    background:#bca98c;box-shadow:0 7px 0 #9c8a70;cursor:pointer;}
+  .prev-btn:active{transform:translateY(4px);box-shadow:0 3px 0 #9c8a70;}
+  .next-btn{font-family:'CookieRun';font-size:20px;border:none;border-radius:18px;padding:14px 44px;color:#fff;
+    background:var(--green);box-shadow:0 7px 0 var(--green-d);cursor:pointer;}
+  .next-btn:active{transform:translateY(4px);box-shadow:0 3px 0 var(--green-d);}
+
+  /* 오답 팝업 */
+  .popup{position:absolute;inset:0;background:rgba(50,40,28,.55);display:none;align-items:center;
+    justify-content:center;border-radius:30px;z-index:10;padding:20px;}
+  .popup.show{display:flex;animation:fade .25s;}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  .card{background:#fff;border-radius:26px;padding:24px;text-align:center;max-width:390px;
+    box-shadow:0 12px 0 rgba(0,0,0,.15);animation:popcard .3s;}
+  @keyframes popcard{0%{transform:scale(.6)}70%{transform:scale(1.05)}100%{transform:scale(1)}}
+  .card .face{font-size:60px;margin-bottom:6px;}
+  .card .msg{font-size:19px;line-height:1.5;margin-bottom:16px;}
+  .card button{font-family:'CookieRun';font-size:18px;border:none;border-radius:16px;padding:12px 28px;color:#fff;cursor:pointer;
+    background:var(--blue);box-shadow:0 5px 0 var(--blue-d);}
+
+  /* 엔딩 */
+  .ending{text-align:center;padding:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;}
+  /* 엔딩: 배경그림 또렷하게 (흰막 약하게) */
+  body.ending-bg::before{background:rgba(255,255,255,.12);}
+  /* 엔딩 글자 카드 — 화면 아래쪽에 반투명으로 */
+  .end-card{background:rgba(255,255,255,.82);border-radius:24px;padding:18px 24px;margin-bottom:4vh;
+    box-shadow:0 8px 24px rgba(0,0,0,.18);max-width:560px;}
+  .medal-sm{font-size:48px;animation:bob 1.6s ease-in-out infinite;}
+  .big-start{font-family:'CookieRun';font-size:20px;border:none;border-radius:20px;padding:14px 34px;color:#fff;
+    background:var(--green);box-shadow:0 7px 0 var(--green-d);cursor:pointer;}
+  .big-start:active{transform:translateY(4px);}
+  .end-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:10px;}
+  .end-msg{font-size:18px;line-height:1.55;margin-bottom:6px;}
+  .ending h1{font-family:'CookieRun';font-weight:700;font-size:26px;margin:6px 0;}
+  .confetti{position:absolute;top:-20px;font-size:24px;animation:fall 3s linear infinite;}
+  @keyframes fall{to{transform:translateY(330px) rotate(360deg);opacity:0;}}
+  /* ===== 모바일(좁은 화면): 한 화면 고정 풀고 스크롤 허용 ===== */
+  @media (max-width:700px){
+    html,body{height:auto;}
+    body{align-items:flex-start;overflow-y:auto;padding:10px;}
+    .game{max-height:none;border-radius:26px;padding:16px;}
+    .stage{max-height:none;}      /* 무대는 16:9 그대로, 높이 제한 해제 */
+    .end-stage{max-height:none;}
+    .home{height:auto;}
+    .ending{height:auto;}
+    .char-intro{grid-template-columns:1fr 1fr 1fr;gap:8px;}
+    .char-text .ro{font-size:11px;}
+    .home h1{font-size:22px;}
+  }
+  /* 아주 좁은 화면: 캐릭터 카드 세로로 */
+  @media (max-width:430px){
+    .char-intro{grid-template-columns:1fr;}
+    .char-card{flex-direction:row;justify-content:flex-start;gap:14px;text-align:left;padding:10px 14px;}
+    .char-face{width:54px;height:54px;font-size:30px;}
+    .char-text .nm{justify-content:flex-start;}
+  }
+  /* 엔딩일 때: 카드 배경 투명하게 해서 그림이 화면 가득 보이게 */
+  body.ending-bg .game{background:transparent;border:none;box-shadow:none;max-width:100%;padding:0;}
+</style>
+</head>
+<body class="t-home">
+<div class="game" id="game"></div>
+
+<script>
+/* =========================================================
+   안전 히어로 — 스토리 진행형 (문제화면 → 정답화면 → 다음 문제화면)
+   화재=루나(6) / 지진=스토니(5) / 미세먼지=파인(6)
+   음성 없음 / 정답 선택지 위치 셔플
+
+   [이미지 파일명] HTML과 같은 폴더에 두면 자동 표시 (없으면 이모지)
+   - 배경: bg_home.webp / bg_fire.webp / bg_quake.webp / bg_dust.webp
+   - 문제: fire_01_q.webp ~   (quake_, dust_ 동일)
+   - 정답: fire_01_a.webp ~   (정답화면에 크게 표시)
+   ========================================================= */
+const IMG_PATH="img/"; // 이미지 파일은 img 폴더에서 불러옵니다
+
+const THEMES={
+  fire:{
+    name:"화재", emoji:"🔥", heroName:"루나", hero:"🦸‍♀️",
+    color:"#ff7a3d", colorD:"#e85d1f", bodyClass:"t-fire", prefix:"fire",
+    recap:"외쳐요 → 젖은수건 → 문 확인 → 낮은자세 → 벽 잡고 비상구 → 계단",
+    ending:"소방차가 도착했어요! 루나는 침착하게 대피한 멋진 소방 히어로예요! 모두 안전해요!",
+    intro:{ story:"루나와 친구들이 유치원에서 즐겁게 블록 놀이를 하고 있어요. 모두 사이좋게 웃고 있어요. 그런데… 어? 어디선가 매캐한 냄새가 나요!",
+      hero:"🦸‍♀️", extra:"🧱🧒", phLabel:"평화로운 교실, 블록 놀이하는 루나와 친구들" },
+    scenes:[
+      { qStory:"어! 저기 교실 한쪽에서 불길과 연기가 보여요. 불이 났나 봐요!",
+        hero:"🦸‍♀️", extra:"🔥", extraPos:{top:"24px",right:"30px"}, phLabel:"교실에 불 + 놀란 루나",
+        correct:{emo:"📢", label:"\"불이야!\" 크게 외치고 어른에게 알린다"},
+        wrong:[{emo:"🛏",label:"무서워서 책상 밑에 숨는다",fb:"숨으면 연기 때문에 위험하고 구조대원이 찾기 힘들어요! 큰 소리로 \"불이야!\" 외쳐요."},
+               {emo:"🎮",label:"모른 척 계속 논다",fb:"불은 점점 커져요! 바로 어른에게 알려야 모두 안전해요."}],
+        aStory:"루나는 큰 소리로 <b>\"불이야! 불이야!\"</b> 외쳤어요. 선생님과 친구들이 모두 알게 되었어요!",
+        aHero:"🦸‍♀️", aExtra:"📢" },
+      { qStory:"매운 연기가 점점 많아져요. 콜록콜록… 숨쉬기가 힘들어요.",
+        hero:"🦸‍♀️", extra:"💨", extraPos:{top:"18px",left:"0",right:"0"}, phLabel:"매운 연기 + 콜록이는 루나",
+        correct:{emo:"💧", label:"물에 적신 수건으로 코·입을 막는다"},
+        wrong:[{emo:"😣",label:"숨을 얼른 참는다",fb:"숨은 오래 참을 수 없어요! 젖은 수건으로 코와 입을 막고 숨을 쉬어요."}],
+        aStory:"루나는 <b>젖은 수건으로 코와 입을 막았어요.</b> 나쁜 연기를 막는 든든한 방패가 생겼어요!",
+        aHero:"🦸‍♀️", aExtra:"💧" },
+      { qStory:"복도로 나가려면 문을 열어야 해요. 그런데 문 너머가 어떤지 알 수 없어요.",
+        hero:"🦸‍♀️", extra:"🚪🔥", extraPos:{top:"22px",left:"0",right:"0"}, phLabel:"닫힌 문 앞 루나",
+        correct:{emo:"🖐", label:"손등을 대보고 뜨거우면 다른 길을 찾는다"},
+        wrong:[{emo:"🚪",label:"확인 없이 문을 벌컥 연다",fb:"뜨거운 문 반대편엔 큰 불이 있어요! 손등으로 확인하고 뜨거우면 다른 길로 가요."}],
+        aStory:"루나는 <b>손등을 문에 살짝 대보았어요.</b> 뜨겁지 않아서 천천히 문을 열고 나갈 수 있었어요!",
+        aHero:"🦸‍♀️", aExtra:"🖐" },
+      { qStory:"복도에 연기가 가득 찼어요. 연기는 위쪽에 둥둥 떠 있어요.",
+        hero:"🦸‍♀️", extra:"💨💨", extraPos:{top:"14px",left:"0",right:"0"}, phLabel:"천장 연기 가득한 복도",
+        correct:{emo:"⬇️", label:"몸을 낮춰 엎드려서 이동한다"},
+        wrong:[{emo:"🏃",label:"일어서서 빠르게 뛴다",fb:"연기는 천장 위로 올라가요! 바닥 가까이 맑은 공기가 있으니 엎드려서 가요."},
+               {emo:"🧍",label:"그 자리에 가만히 서 있는다",fb:"가만히 있으면 연기를 계속 마셔요. 낮은 자세로 움직여요."}],
+        aStory:"루나는 <b>몸을 낮추고 엎드려서 기어갔어요.</b> 바닥 가까이 맑은 공기로 숨을 쉴 수 있었어요!",
+        aHero:"🧎‍♀️", aExtra:"" },
+      { qStory:"그런데 갑자기 깜깜해졌어요! 앞이 잘 안 보여요. 저 멀리 초록색 비상구 불빛만 희미하게 보여요.",
+        hero:"🦸‍♀️", dark:true, extra:"🟢", extraPos:{bottom:"22px",right:"24px"}, phLabel:"어두운 복도 + 멀리 비상구등",
+        correct:{emo:"🧱", label:"벽을 손으로 잡고 따라가며 비상구를 찾는다"},
+        wrong:[{emo:"😢",label:"무서워서 멈춰 서서 운다",fb:"멈추면 안 돼요! 벽을 한 손으로 잡고 길을 따라가요."},
+               {emo:"🏃",label:"손을 놓고 아무 데나 막 뛴다",fb:"막 뛰면 부딪혀요! 벽을 잡고 천천히 비상구를 찾아요."}],
+        aStory:"루나는 <b>벽을 손으로 짚고 천천히 따라갔어요.</b> 초록색 비상구를 무사히 찾았어요!",
+        aHero:"🦸‍♀️", aExtra:"🟢" },
+      { qStory:"비상구에 도착했어요! 아래로 내려가야 해요. 계단으로 갈까요, 엘리베이터로 갈까요?",
+        hero:"🦸‍♀️", extra:"🪜🛗", extraPos:{top:"22px",left:"0",right:"0"}, phLabel:"계단 vs 엘리베이터",
+        correct:{emo:"👣", label:"계단으로 내려간다"},
+        wrong:[{emo:"⬆️",label:"엘리베이터를 탄다",fb:"불날 땐 전기가 끊겨 엘리베이터가 멈출 수 있어요! 꼭 계단으로 가요."}],
+        aStory:"루나는 <b>계단으로 또박또박 내려왔어요.</b> 드디어 운동장으로 무사히 탈출 성공! 🚒",
+        aHero:"🦸‍♀️", aExtra:"🪜", isFinal:true },
+    ]
+  },
+
+  quake:{
+    name:"지진", emoji:"🌍", heroName:"스토니", hero:"🦸",
+    color:"#b78b4e", colorD:"#97703a", bodyClass:"t-quake", prefix:"quake",
+    recap:"탁자 밑 → 가방으로 머리 막고 문열기 → 신발 → 넓은 곳",
+    ending:"스토니는 머리를 지키고 침착하게 대피한 멋진 지진 히어로예요! 모두 안전해요!",
+    intro:{ story:"스토니와 친구들이 교실에서 도란도란 그림을 그리고 있어요. 참 평화로운 날이에요. 그런데… 어? 갑자기 땅이 흔들리기 시작했어요!",
+      hero:"🦸", extra:"🎨🧒", phLabel:"평화로운 교실, 그림 그리는 스토니와 친구들" },
+    scenes:[
+      { qStory:"갑자기 우르르 쾅! 땅이 흔들려요. 책상 위 물건들이 덜그럭덜그럭 떨어져요!",
+        hero:"🦸", shake:true, extra:"🪑", extraPos:{bottom:"22px",right:"30px"}, phLabel:"흔들리는 교실 + 탁자",
+        correct:{emo:"🪑", label:"탁자 밑에 들어가 다리를 꼭 잡는다"},
+        wrong:[{emo:"🏃",label:"허둥지둥 밖으로 뛰어나간다",fb:"흔들릴 때 움직이면 물건에 맞아요! 탁자 밑에서 머리를 지켜요."},
+               {emo:"🧍",label:"그 자리에 가만히 서 있는다",fb:"서 있으면 물건이 떨어져요! 탁자 밑으로 들어가 다리를 잡아요."}],
+        aStory:"스토니는 <b>탁자 밑으로 쏙 들어가 다리를 꼭 잡았어요.</b> 흔들리는 동안 안전하게 몸을 지켰어요!",
+        aHero:"🦸", aExtra:"🪑" },
+      { qStory:"드디어 흔들림이 멈췄어요. 이제 밖으로 나갈 준비를 해야 해요. 그런데 또 흔들릴지도 몰라요.",
+        hero:"🦸", extra:"🎒🚪", extraPos:{top:"22px",left:"0",right:"0"}, phLabel:"가방으로 머리 가리고 현관문 열기",
+        correct:{emo:"🎒", label:"가방으로 머리를 막으면서 현관문을 열어 둔다"},
+        wrong:[{emo:"🚪",label:"문을 꼭 닫고 가만히 기다린다",fb:"문이 뒤틀려 갇히면 안 돼요! 가방으로 머리를 지키면서 문을 열어 둬요."}],
+        aStory:"스토니는 <b>가방으로 머리를 막으면서 현관문을 활짝 열어 두었어요.</b> 머리도 지키고 나갈 길도 만들었어요!",
+        aHero:"🦸", aExtra:"🎒" },
+      { qStory:"바닥에 깨진 유리 조각이 반짝반짝 흩어져 있어요. 그냥 나가면 발을 다칠 수 있어요.",
+        hero:"🦸", extra:"👟", extraPos:{bottom:"22px",right:"30px"}, phLabel:"바닥 유리 조각 + 신발",
+        correct:{emo:"👟", label:"신발을 신고 조심히 걸어 나간다"},
+        wrong:[{emo:"🦶",label:"맨발로 그냥 뛰어나간다",fb:"바닥에 깨진 유리가 있어요! 신발을 꼭 신고 조심히 걸어요."}],
+        aStory:"스토니는 <b>신발을 신고 조심조심 걸어 나갔어요.</b> 발을 다치지 않고 안전하게 이동했어요!",
+        aHero:"🦸", aExtra:"👟" },
+      { qStory:"건물 밖으로 나왔어요. 옆에는 높은 담벼락과 큰 나무, 저쪽에는 텅 빈 넓은 길이 있어요.",
+        hero:"🦸", extra:"🧱🌳", extraPos:{top:"20px",left:"0",right:"0"}, phLabel:"담벼락·나무 vs 넓은 운동장",
+        correct:{emo:"🏃", label:"담벼락·나무에서 멀리 떨어진 넓은 곳으로 간다"},
+        wrong:[{emo:"🧱",label:"튼튼해 보이는 담벼락 밑에서 쉰다",fb:"담벼락은 지진에 쉽게 무너져요! 넓고 텅 빈 곳으로 가요."},
+               {emo:"🌳",label:"큰 나무 밑에 들어가 숨는다",fb:"나뭇가지가 떨어질 수 있어요! 아무것도 없는 넓은 곳이 안전해요."}],
+        aStory:"스토니는 <b>담벼락에서 멀리 떨어진 넓은 운동장으로 갔어요.</b> 스토니와 친구들 모두 이제 안전해요! 🌍",
+        aHero:"🦸", aExtra:"🧑‍🏫🧒", isFinal:true },
+    ]
+  },
+
+  dust:{
+    name:"미세먼지", emoji:"😷", heroName:"파인", hero:"🦸‍♂️",
+    color:"#7d97a8", colorD:"#5f7888", bodyClass:"t-dust", prefix:"dust",
+    recap:"알리미 확인 → 마스크 → 코 밀착 → 창문 닫기 → 손·얼굴 씻기 → 물 마시기",
+    ending:"파인은 마스크도 잘 쓰고 깨끗이 씻은 멋진 미세먼지 히어로예요! 오늘도 건강하게 하루를 보냈어요!",
+    intro:{ story:"파인과 친구들이 창밖을 내다봐요. 어제는 하늘이 파랬는데… 오늘은 어쩐지 뿌옇고 회색이에요. 무슨 일일까요?",
+      hero:"🦸‍♂️", extra:"🪟🧒", phLabel:"창밖을 보는 파인과 친구들, 뿌연 하늘" },
+    scenes:[
+      { qStory:"창밖 하늘이 뿌옇고 회색이에요. 벽에 붙은 미세먼지 알리미가 빨간색으로 반짝여요!",
+        hero:"🦸‍♂️", extra:"🔴", extraPos:{top:"20px",right:"30px"}, phLabel:"뿌연 창밖 + 빨강 알리미",
+        correct:{emo:"🏠", label:"밖에 나가지 않고 실내에서 논다"},
+        wrong:[{emo:"🌳",label:"신나게 놀이터로 뛰어나간다",fb:"먼지 괴물이 많은 날은 집 안에서 노는 게 가장 안전해요!"},
+               {emo:"🪟",label:"시원하게 창문을 활짝 연다",fb:"창문을 열면 먼지 괴물이 들어와요! 오늘은 닫아둬요."}],
+        aStory:"파인은 <b>밖에 나가지 않고 교실 안에서 놀기로 했어요.</b> 먼지 괴물을 피하는 똑똑한 선택이에요!",
+        aHero:"🦸‍♂️", aExtra:"🏠" },
+      { qStory:"그래도 잠깐 밖에 나가야 할 일이 생겼어요. 회색 먼지가 둥둥 떠다녀요.",
+        hero:"🦸‍♂️", extra:"😷", extraPos:{top:"18px",left:"0",right:"0"}, phLabel:"보건용 마스크 챙기기",
+        correct:{emo:"😷", label:"보건용 마스크를 쓴다"},
+        wrong:[{emo:"🏃",label:"아무것도 안 쓰고 그냥 나간다",fb:"마스크 없이 나가면 먼지를 마셔요! 꼭 마스크를 써요."}],
+        aStory:"파인은 <b>보건용 마스크를 썼어요.</b> 먼지 괴물을 막는 히어로 마스크로 변신!",
+        aHero:"🦸‍♂️", aExtra:"😷" },
+      { qStory:"마스크를 썼어요. 그런데 코 옆에 작은 틈이 살짝 벌어져 있어요.",
+        hero:"🦸‍♂️", extra:"🤏", extraPos:{top:"18px",left:"0",right:"0"}, phLabel:"콧등 철사 누르기",
+        correct:{emo:"👌", label:"코 부분 철사를 꾹 눌러 빈틈없이 밀착한다"},
+        wrong:[{emo:"😮",label:"코는 내놓고 입만 가린다",fb:"코를 내놓으면 먼지가 쏙 들어와요! 코까지 덮어요."},
+               {emo:"🧣",label:"답답해서 턱에 걸친다",fb:"턱에 걸치면 소용없어요! 코 철사를 꾹 눌러 빈틈을 막아요."}],
+        aStory:"파인은 <b>코 부분 철사를 손가락으로 꾹 눌렀어요.</b> 빈틈없이 딱 붙어 먼지가 못 들어와요!",
+        aHero:"🦸‍♂️", aExtra:"🤏" },
+      { qStory:"집에 돌아왔어요. 창문이 활짝 열려 있어서 회색 먼지가 솔솔 들어와요!",
+        hero:"🦸‍♂️", extra:"🪟", extraPos:{top:"20px",right:"30px"}, phLabel:"열린 창문 + 들어오는 먼지",
+        correct:{emo:"🚪", label:"창문을 꽉 닫는다"},
+        wrong:[{emo:"🪟",label:"바람 쐬려고 창문을 연다",fb:"미세먼지가 심할 땐 창문을 닫아야 집 안 공기를 지켜요!"}],
+        aStory:"파인은 <b>창문을 꽉 닫았어요.</b> 집 안 공기를 깨끗하게 지켰어요!",
+        aHero:"🦸‍♂️", aExtra:"🚪" },
+      { qStory:"밖에서 놀다 왔더니 손과 얼굴에 보이지 않는 먼지가 잔뜩 묻었어요.",
+        hero:"🦸‍♂️", extra:"🧼", extraPos:{top:"20px",right:"30px"}, phLabel:"세면대 손·얼굴 씻기",
+        correct:{emo:"🧼", label:"손·얼굴을 비누로 씻고 양치질을 한다"},
+        wrong:[{emo:"🍪",label:"배고프니까 바로 간식을 먹는다",fb:"몸에 붙은 먼지를 먼저 씻어내야 해요! 손·얼굴부터 깨끗이!"}],
+        aStory:"파인은 <b>비누 거품으로 손과 얼굴을 깨끗이 씻고 양치질도 했어요.</b> 먼지 괴물이 싹 사라졌어요!",
+        aHero:"🦸‍♂️", aExtra:"🧼" },
+      { qStory:"깨끗이 씻고 나니, 목이 칼칼하고 답답해요.",
+        hero:"🦸‍♂️", extra:"💧", extraPos:{top:"20px",right:"30px"}, phLabel:"물 마시기",
+        correct:{emo:"💧", label:"깨끗한 물을 자주 마시고 푹 쉰다"},
+        wrong:[{emo:"🏃",label:"또 밖에 나가서 논다",fb:"미세먼지 나쁜 날엔 자꾸 나가면 안 돼요! 물을 마시고 푹 쉬어요."}],
+        aStory:"파인은 <b>깨끗한 물을 꿀꺽꿀꺽 마시고 푹 쉬었어요.</b> 몸속 먼지까지 깨끗하게!",
+        aHero:"🦸‍♂️", aExtra:"💧", isFinal:true },
+    ]
+  },
+};
+
+/* ===================== 상태 ===================== */
+let curKey=null, idx=0, curChoices=[];
+const game=document.getElementById('game');
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+/* ===================== 메인 ===================== */
+function setBg(){
+  const b=document.body.style;
+  b.backgroundRepeat='no-repeat';
+  b.backgroundSize='cover';
+  b.backgroundPosition='center';
+  b.backgroundAttachment='fixed';
+}
+function renderHome(){
+  document.body.className='t-home';
+  document.body.style.backgroundImage='none';setBg();
+  game.innerHTML=`<div class="home">
+    <h1>히어로 친구들과 함께<br>안전하게 대피하는 방법을 배워요!</h1>
+
+    <div class="char-intro">
+      <div class="char-card">
+        <div class="char-face cf-fire"><img src="${IMG_PATH}face_luna.webp" alt="" onerror="this.parentNode.textContent='🦸‍♀️'"></div>
+        <div class="char-text"><div class="nm">루나 🔥</div>
+          <div class="ro">불이 났을 때 안전하게 대피하는 방법을 알려줘요</div></div>
+      </div>
+      <div class="char-card">
+        <div class="char-face cf-quake"><img src="${IMG_PATH}face_stony.webp" alt="" onerror="this.parentNode.textContent='🦸'"></div>
+        <div class="char-text"><div class="nm">스토니 🌍</div>
+          <div class="ro">지진이 났을 때 몸을 안전하게 지키는 방법을 알려줘요</div></div>
+      </div>
+      <div class="char-card">
+        <div class="char-face cf-dust"><img src="${IMG_PATH}face_pine.webp" alt="" onerror="this.parentNode.textContent='🦸‍♂️'"></div>
+        <div class="char-text"><div class="nm">파인 😷</div>
+          <div class="ro">미세먼지가 심한 날 건강을 지키는 방법을 알려줘요</div></div>
+      </div>
+    </div>
+
+    <div class="home-sub">어떤 미션을 해볼까요?</div>
+    <div class="theme-grid">
+      <button class="theme-btn tb-fire" onclick="startTheme('fire')"><span class="emo">🔥</span>
+        <span class="bt"><b>유치원에 불이 났어요!</b><small>루나와 함께 친구들을 안전하게 대피시켜요!</small></span></button>
+      <button class="theme-btn tb-quake" onclick="startTheme('quake')"><span class="emo">🌍</span>
+        <span class="bt"><b>땅이 흔들흔들 지진이 났어요!</b><small>스토니와 함께 몸을 안전하게 지켜요!</small></span></button>
+      <button class="theme-btn tb-dust" onclick="startTheme('dust')"><span class="emo">😷</span>
+        <span class="bt"><b>하늘이 뿌연 미세먼지 가득한 날!</b><small>파인과 함께 우리 몸 건강을 지켜요!</small></span></button>
+    </div>
+  </div>`;
+}
+function startTheme(k){curKey=k;idx=0;renderIntro();}
+
+/* ===================== 인트로 화면 ===================== */
+function renderIntro(){
+  const T=THEMES[curKey], it=T.intro;
+  document.body.className=T.bodyClass;
+  document.body.style.backgroundImage=`url('${IMG_PATH}bg_${T.prefix}.webp')`;setBg();
+  const introImg=`${T.prefix}_00_intro.webp`;
+  game.innerHTML=`
+    <div class="topbar">
+      <button class="home-btn" onclick="renderHome()">🏠 처음</button>
+      <div class="badge" style="background:${T.color}">${T.name} 이야기</div>
+      <div class="progress"></div>
+    </div>
+    <div class="stage" style="background:linear-gradient(180deg,#eafff0,#d4f0dd)">
+      <span class="ph-label">🖼 ${introImg} — ${it.phLabel}</span>
+      <img class="scene-img" src="${IMG_PATH}${introImg}" alt="" onload="this.closest('.stage').classList.add('has-img')" onerror="this.style.display='none'">
+      <div class="hero">${it.hero}</div>
+      ${it.extra?`<div class="extra" style="top:18px;right:26px">${it.extra}</div>`:''}
+    </div>
+    <div class="story"><span class="ico">📖</span><span style="flex:1">${it.story}</span></div>
+    <div class="next-wrap">
+      <button class="next-btn" onclick="renderQuestion()">미션 시작하기 ▶</button>
+    </div>`;
+}
+
+/* 공통: 상단바 + 진행점 */
+function topbarHTML(T){
+  const dots=T.scenes.map((_,i)=>{let c='dot';if(i<idx)c+=' done';return `<div class="${c}" ${i===idx?`style="background:${T.color};transform:scale(1.15)"`:''}></div>`;}).join('');
+  return `<div class="topbar">
+    <button class="home-btn" onclick="renderHome()">🏠 처음</button>
+    <div class="badge" style="background:${T.color}">${T.name} ${idx+1}/${T.scenes.length}</div>
+    <div class="progress">${dots}</div></div>`;
+}
+
+/* ===================== 문제 화면 ===================== */
+function renderQuestion(){
+  const T=THEMES[curKey], s=T.scenes[idx];
+  document.body.className=T.bodyClass;
+  document.body.style.backgroundImage=`url('${IMG_PATH}bg_${T.prefix}.webp')`;setBg();
+  const num=String(idx+1).padStart(2,'0');
+  const qImg=`${T.prefix}_${num}_q.webp`;
+  const ex=s.extraPos?Object.entries(s.extraPos).map(([k,v])=>`${k}:${v}`).join(';'):'';
+
+  curChoices=shuffle([{...s.correct,correct:true}, ...s.wrong.map(w=>({...w,correct:false}))]);
+  const choicesHTML=curChoices.map((c,i)=>
+    `<button class="choice" data-i="${i}" style="background:${T.color};box-shadow:0 6px 0 ${T.colorD}" onclick="pick(${i})"><span class="cemo">${c.emo}</span><span>${c.label}</span></button>`
+  ).join('');
+
+  game.innerHTML=`
+    ${topbarHTML(T)}
+    <div class="stage ${s.dark?'dark':''} ${s.shake?'shaking':''}" style="background:${s.stageBg||'none'}">
+      <span class="ph-label">🖼 ${qImg} — ${s.phLabel}</span>
+      <img class="scene-img" src="${IMG_PATH}${qImg}" alt="" onload="this.closest('.stage').classList.add('has-img')" onerror="this.style.display='none'">
+      <div class="hero">${s.hero}</div>
+      ${s.extra?`<div class="extra" style="${ex}">${s.extra}</div>`:''}
+    </div>
+    <div class="story"><span class="ico">📖</span><span style="flex:1">${s.qStory}</span></div>
+    <div class="choices">${choicesHTML}</div>
+    <div class="popup" id="popup"><div class="card" id="card"></div></div>`;
+}
+
+/* ===================== 선택 ===================== */
+function pick(i){
+  const c=curChoices[i];
+  if(c.correct){ renderAnswer(); }
+  else{
+    const el=document.querySelector(`.choice[data-i="${i}"]`);
+    if(el){el.classList.add('shake');setTimeout(()=>el.classList.remove('shake'),400);}
+    const p=document.getElementById('popup'),card=document.getElementById('card');
+    card.innerHTML=`<div class="face">🤔</div><div class="msg">${c.fb}</div>
+      <button onclick="closePopup()">다시 골라볼까요? 🔄</button>`;
+    p.classList.add('show');
+  }
+}
+function closePopup(){document.getElementById('popup').classList.remove('show');}
+
+/* ===================== 정답 화면 ===================== */
+function renderAnswer(){
+  const T=THEMES[curKey], s=T.scenes[idx];
+  const num=String(idx+1).padStart(2,'0');
+  const aImg=`${T.prefix}_${num}_a.webp`;
+  const last=s.isFinal;
+  game.innerHTML=`
+    ${topbarHTML(T)}
+    <div class="stage answer" style="background:linear-gradient(180deg,#fff7d6,#ffe9a8)">
+      <span class="ph-label">🖼 ${aImg} — 정답 장면</span>
+      <img class="scene-img" src="${IMG_PATH}${aImg}" alt="" onload="this.closest('.stage').classList.add('has-img')" onerror="this.style.display='none'">
+      <div class="hero">${s.aHero||s.hero}</div>
+      ${s.aExtra?`<div class="extra" style="top:18px;right:26px">${s.aExtra}</div>`:''}
+    </div>
+    <div class="story"><span class="ico">✨</span><span style="flex:1">${s.aStory}</span></div>
+    <div class="next-wrap">
+      <button class="prev-btn" onclick="prevStep()">◀ 이전</button>
+      <button class="next-btn" onclick="${last?'renderEnding()':'nextQuestion()'}">${last?'🏅 끝까지 해냈어요!':'다음 이야기 ▶'}</button>
+    </div>`;
+}
+function nextQuestion(){idx++;renderQuestion();}
+function prevStep(){ if(idx<=0){ renderIntro(); } else { idx--; renderQuestion(); } }
+
+/* ===================== 엔딩 ===================== */
+function renderEnding(){
+  const T=THEMES[curKey];
+  const endImg=`${T.prefix}_ending.webp`;
+  // 엔딩 그림을 화면 전체 배경으로
+  document.body.style.backgroundImage=`url('${IMG_PATH}${endImg}')`;setBg();
+  document.body.classList.add('ending-bg');
+  const conf=['🎊','✨','🎉','⭐','🎈'].map((c,i)=>`<span class="confetti" style="left:${10+i*18}%;animation-delay:${i*.4}s">${c}</span>`).join('');
+  game.innerHTML=`${conf}
+    <div class="ending">
+      <div class="end-card">
+        <div class="medal-sm">🏅</div>
+        <h1 style="color:${T.colorD}">${T.heroName} 히어로 완성!</h1>
+        <p class="end-msg">${T.ending}</p>
+        <div class="end-btns">
+          <button class="big-start" onclick="endReset();startTheme('${curKey}')">🔄 다시 하기</button>
+          <button class="big-start" style="background:#4aa3ff;box-shadow:0 7px 0 #2d7fd6" onclick="endReset();renderHome()">🦸 다른 미션 고르기</button>
+        </div>
+      </div>
+    </div>`;
+}
+/* 엔딩 떠날 때 배경 원복용 플래그 해제 */
+function endReset(){ document.body.classList.remove('ending-bg'); }
+
+renderHome();
+</script>
+</body>
+</html>
