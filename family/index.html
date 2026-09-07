@@ -1,0 +1,520 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>우리 가족 지진 안전 3컷</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Do+Hyeon&family=Gowun+Dodum&display=swap');
+  :root{
+    --sky:#cfeeff;
+    --sky2:#eefaff;
+    --blue:#0f55c7;
+    --deep:#0a3f9a;
+    --teal:#2c8e9c;
+    --cream:#fff8e8;
+    --yellow:#ffd85e;
+    --ink:#174366;
+    --card:#ffffff;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0; width:100%; min-height:100%; font-family:"Gowun Dodum","Noto Sans KR","Apple SD Gothic Neo",sans-serif; color:var(--ink); background:linear-gradient(#bde6ff 0%, #eaf7ff 62%, #dff1dc 100%)}
+  body{overflow-x:hidden}
+  .app{
+    min-height:100dvh;
+    display:flex;
+    flex-direction:column;
+    position:relative;
+    isolation:isolate;
+    padding:max(10px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom));
+  }
+  .app::before{
+    content:""; position:fixed; inset:0; z-index:-2;
+    background:
+      radial-gradient(circle at 13% 13%, rgba(255,255,255,.9) 0 4%, transparent 4.2%),
+      radial-gradient(circle at 84% 10%, rgba(255,255,255,.75) 0 3.5%, transparent 3.7%),
+      linear-gradient(160deg, transparent 0 58%, rgba(255,255,255,.28) 58.2% 59%, transparent 59.2%),
+      linear-gradient(180deg, #9fd8ff 0%, #d8f0ff 58%, #cfe6b2 58.5%, #8fc145 100%);
+  }
+  .hill{position:fixed; left:-8vw; right:-8vw; bottom:-3vh; height:26vh; z-index:-1; opacity:.9; pointer-events:none}
+  .hill::before,.hill::after{content:""; position:absolute; border-radius:50% 50% 0 0 / 100% 100% 0 0; bottom:0}
+  .hill::before{left:0; width:62%; height:100%; background:#a8d45b; transform:rotate(-2deg)}
+  .hill::after{right:0; width:66%; height:84%; background:#6fa70d; transform:rotate(2deg)}
+
+  header{display:flex; align-items:center; justify-content:space-between; gap:10px; max-width:1120px; width:100%; margin:0 auto 8px; flex:0 0 auto}
+  .title-wrap{display:flex; align-items:center; gap:10px; min-width:0}
+  .badge{font-family:"Do Hyeon","Noto Sans KR",sans-serif; background:linear-gradient(180deg,#1f68da,#094db6); color:#fff; padding:8px 12px; border-radius:10px 10px 4px 4px; font-weight:900; letter-spacing:.03em; box-shadow:0 4px 0 #083b87; white-space:nowrap; font-size:clamp(12px,2.3vw,16px)}
+  h1{font-family:"Do Hyeon","Noto Sans KR",sans-serif; margin:0; font-size:clamp(24px,6vw,46px); line-height:1; font-weight:1000; color:#24798a; letter-spacing:-.06em; text-shadow:0 3px 0 #fff, 0 6px 0 rgba(13,89,105,.08)}
+  .shield{width:52px;height:58px; flex:0 0 auto; display:grid; place-items:center; font-size:30px; background:linear-gradient(#2c72d8,#0e51bd); color:#ffd94d; clip-path:polygon(50% 0,90% 14%,84% 67%,50% 100%,16% 67%,10% 14%); filter:drop-shadow(0 4px 0 rgba(0,0,0,.16))}
+
+  .intro{max-width:1120px;width:100%;margin:0 auto 8px; text-align:center; font-weight:800; font-size:clamp(13px,2.7vw,18px); color:#145080; background:rgba(255,255,255,.74); border:2px solid rgba(15,85,199,.12); border-radius:18px; padding:7px 10px; backdrop-filter:blur(3px)}
+
+  .shots{max-width:1120px;width:100%;margin:0 auto; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; flex:1 1 auto; min-height:0}
+  .shot{background:rgba(255,248,232,.95); border:3px solid #fff; outline:2px solid rgba(15,85,199,.48); border-radius:22px; padding:8px; box-shadow:0 7px 0 rgba(20,67,102,.12); display:flex; flex-direction:column; min-width:0; position:relative}
+  .mission{display:flex; align-items:center; justify-content:space-between; gap:6px; margin-bottom:6px}
+  .m-tag{font-family:"Do Hyeon","Noto Sans KR",sans-serif; font-size:clamp(10px,2vw,14px); font-weight:950; color:white; background:linear-gradient(#2b77e2,#0a4db2); border-radius:8px; padding:5px 7px; box-shadow:0 3px 0 #073b87; white-space:nowrap}
+  .num{width:26px;height:26px;border-radius:50%;background:#0f55c7;color:white;display:grid;place-items:center;font-weight:950;font-size:13px}
+  .photo{
+    position:relative; overflow:hidden; border-radius:16px; background:linear-gradient(#dff4ff 0 70%, #96c93d 70%); border:2px solid #d7ebf9; min-height:0; flex:1 1 auto; aspect-ratio:4/5;
+    display:grid;place-items:center;
+  }
+  .photo::after{content:""; position:absolute; width:140%; height:30%; bottom:-12%; left:-20%; background:#74a80e; border-radius:50% 50% 0 0 / 100% 100% 0 0; opacity:.92}
+  .photo img{width:100%;height:100%;object-fit:cover;display:none;position:relative;z-index:2}
+  .placeholder{position:relative; z-index:1; display:grid; place-items:center; text-align:center; padding:10px; color:#4f7f9a; font-weight:850; font-size:clamp(11px,2.4vw,16px)}
+  .cam-ico{font-size:clamp(28px,6vw,46px); line-height:1; margin-bottom:6px}
+  .shot-title{font-family:"Do Hyeon","Noto Sans KR",sans-serif; font-size:clamp(14px,3.4vw,22px); font-weight:1000; letter-spacing:-.04em; line-height:1.1; margin:7px 0 2px; text-align:center; color:#155177}
+  .shot-desc{font-size:clamp(10px,2.1vw,14px); line-height:1.35; text-align:center; min-height:2.7em; font-weight:750; color:#3d647b; margin:0 2px 6px}
+  .take{font-family:"Do Hyeon","Noto Sans KR",sans-serif; display:flex; align-items:center; justify-content:center; gap:6px; width:100%; border:none; background:linear-gradient(#ffdf72,#ffc93d); color:#174366; font-weight:950; font-size:clamp(11px,2.5vw,15px); border-radius:12px; padding:9px 7px; box-shadow:0 3px 0 #d6a61f; cursor:pointer; touch-action:manipulation}
+  .take:active{transform:translateY(2px); box-shadow:0 1px 0 #d6a61f}
+  input[type=file]{display:none}
+
+  .bottom{max-width:1120px;width:100%;margin:9px auto 0; display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap; flex:0 0 auto}
+  .notice{flex:1 1 360px; background:rgba(255,248,220,.96); border:2px solid #efd477; border-radius:15px; padding:8px 12px; font-weight:850; text-align:center; font-size:clamp(11px,2.4vw,15px); box-shadow:0 4px 0 rgba(182,139,30,.18)}
+  .notice b{color:#0f55c7}
+  .action{font-family:"Do Hyeon","Noto Sans KR",sans-serif; border:none;border-radius:14px;padding:10px 15px;font-weight:950;font-size:clamp(12px,2.5vw,15px);cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.16);touch-action:manipulation}
+  .save{background:#0f55c7;color:#fff}
+  .reset{background:#fff;color:#31536d;border:1px solid #c7d9e7}
+  .status{font-size:12px;font-weight:850;color:#175777;min-width:90px;text-align:center}
+  .complete{font-family:"Gowun Dodum","Noto Sans KR",sans-serif; display:none; position:fixed; inset:auto 12px max(12px,env(safe-area-inset-bottom)); margin:auto; max-width:460px; background:#fff; border:3px solid #0f55c7; border-radius:18px; padding:12px 16px; z-index:20; box-shadow:0 14px 40px rgba(0,0,0,.2); text-align:center; font-weight:900}
+  .complete.show{display:block; animation:pop .25s ease-out}
+  @keyframes pop{from{transform:translateY(20px);opacity:0}to{transform:none;opacity:1}}
+
+
+
+
+  .landscape-tip{display:inline-block;margin-left:8px;padding:2px 8px;border-radius:999px;background:rgba(15,85,199,.09);color:#0f55c7;font-size:.86em;white-space:nowrap}
+  .sheet-note{font-size:12px;line-height:1.45;color:#6a7882;text-align:center;padding:3px 8px 8px}
+  .sheet-btn[disabled]{opacity:.45;cursor:not-allowed;filter:grayscale(.25)}
+  .sheet-help{font-size:11px;line-height:1.4;color:#7b8790;text-align:center;margin-top:5px}
+
+  /* 사진 선택 메뉴 */
+  .sheet-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:60;display:none;align-items:flex-end;justify-content:center;padding:12px max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));backdrop-filter:blur(2px)}
+  .sheet-backdrop.show{display:flex}
+  .sheet{width:min(520px,100%);background:#fff;border-radius:22px;padding:12px;box-shadow:0 18px 55px rgba(0,0,0,.25);animation:sheetUp .2s ease-out}
+  @keyframes sheetUp{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+  .sheet-title{font-family:"Do Hyeon","Noto Sans KR",sans-serif;text-align:center;font-size:22px;color:#174366;padding:5px 6px 10px}
+  .sheet-btn{font-family:"Gowun Dodum","Noto Sans KR",sans-serif;width:100%;border:0;border-radius:14px;padding:14px 12px;margin:5px 0;font-size:16px;font-weight:900;cursor:pointer;touch-action:manipulation}
+  .sheet-camera{background:#0f55c7;color:#fff}.sheet-gallery{background:#eaf5ff;color:#174366}.sheet-cancel{background:#f4f5f7;color:#5d6872}
+
+  /* 앱 내부 카메라 */
+  .camera-modal{position:fixed;inset:0;background:#0b1720;z-index:80;display:none;flex-direction:column;align-items:center;justify-content:center;padding:max(10px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left))}
+  .camera-modal.show{display:flex}
+  .camera-top{width:min(760px,100%);display:flex;align-items:center;justify-content:space-between;color:#fff;margin-bottom:8px;padding:0 2px}
+  .camera-title{font-family:"Do Hyeon","Noto Sans KR",sans-serif;font-size:20px;letter-spacing:.02em}
+  .camera-close{border:0;background:rgba(255,255,255,.15);color:white;width:40px;height:40px;border-radius:50%;font-size:22px;cursor:pointer}
+  .camera-stage{width:min(760px,100%);flex:1 1 auto;min-height:0;display:grid;place-items:center;position:relative;overflow:hidden;border-radius:18px;background:#000}
+  .camera-stage video,.camera-stage canvas{width:100%;height:100%;object-fit:cover;display:block}
+  .camera-stage canvas{display:none}
+  .camera-stage.review video{display:none}.camera-stage.review canvas{display:block}
+  .camera-controls{width:min(760px,100%);display:flex;justify-content:center;align-items:center;gap:12px;padding-top:10px;flex:0 0 auto}
+  .camera-btn{font-family:"Do Hyeon","Noto Sans KR",sans-serif;border:0;border-radius:16px;padding:11px 18px;font-size:16px;font-weight:900;cursor:pointer;touch-action:manipulation;min-width:112px}
+  .camera-shoot{background:#fff;color:#123b56}.camera-retake{background:#394b58;color:#fff;display:none}.camera-use{background:#ffd85e;color:#173b55;display:none}
+  .camera-controls.review .camera-shoot{display:none}.camera-controls.review .camera-retake,.camera-controls.review .camera-use{display:block}
+  .camera-hint{color:#cce8ff;font-size:12px;text-align:center;padding-top:6px;min-height:1.5em}
+
+  /* 가로형 모바일 최적화 */
+  @media (orientation: landscape) and (max-height:600px){
+    .app{padding-top:max(5px,env(safe-area-inset-top));padding-bottom:max(5px,env(safe-area-inset-bottom))}
+    header{margin-bottom:3px}.shield{width:34px;height:38px;font-size:20px}.badge{padding:5px 7px;font-size:12px}h1{font-size:24px}
+    .intro{display:none}.shots{gap:6px}.shot{padding:5px;border-radius:14px;box-shadow:0 4px 0 rgba(20,67,102,.1)}
+    .mission{margin-bottom:3px}.m-tag{padding:3px 5px;font-size:10px}.num{width:20px;height:20px;font-size:10px}
+    .photo{aspect-ratio:auto;min-height:104px;border-radius:10px}.placeholder{font-size:9px;padding:3px}.cam-ico{font-size:24px;margin-bottom:2px}
+    .shot-title{font-size:13px;margin:4px 0 0;min-height:auto}.shot-desc{font-size:9px;line-height:1.2;min-height:2.4em;margin:2px 2px 4px}
+    .take{font-size:10px;padding:6px 4px;border-radius:8px;box-shadow:0 2px 0 #d6a61f}
+    .bottom{margin-top:5px;gap:5px}.notice{display:none}.action{padding:7px 10px;font-size:10px;border-radius:9px}.status{font-size:10px;min-width:62px}
+    .complete{font-size:13px;padding:8px 10px}
+    .camera-top{margin-bottom:5px}.camera-title{font-size:17px}.camera-close{width:34px;height:34px}.camera-stage{border-radius:12px}.camera-controls{padding-top:6px;gap:8px}.camera-btn{padding:8px 13px;font-size:14px;min-width:98px}.camera-hint{font-size:10px;padding-top:3px}
+  }
+
+  @media (max-width:520px){
+    .app{padding-left:7px;padding-right:7px}
+    header{margin-bottom:5px}
+    .shield{width:38px;height:42px;font-size:22px}
+    .badge{padding:6px 8px}
+    .intro{padding:5px 8px;margin-bottom:6px}.landscape-tip{display:block;width:max-content;max-width:100%;margin:4px auto 0}
+    .shots{gap:5px}
+    .shot{padding:5px;border-radius:15px;outline-width:1px;border-width:2px}
+    .mission{margin-bottom:4px}
+    .m-tag{padding:4px 5px;border-radius:6px}
+    .num{width:22px;height:22px;font-size:11px}
+    .photo{border-radius:11px;aspect-ratio:3/4}
+    .placeholder{padding:4px;font-size:9px}
+    .cam-ico{font-size:27px;margin-bottom:3px}
+    .shot-title{font-family:"Do Hyeon","Noto Sans KR",sans-serif; font-size:12px;margin:5px 0 1px;min-height:2.2em;display:flex;align-items:center;justify-content:center}
+    .shot-desc{font-size:9px;min-height:3.8em;margin-bottom:4px}
+    .take{font-size:10px;padding:7px 3px;border-radius:9px}
+    .bottom{margin-top:6px;gap:5px}
+    .notice{order:3;flex-basis:100%;font-size:10px;padding:5px 7px}
+    .action{padding:9px 12px;font-size:11px}
+    .status{font-size:10px;min-width:70px}
+  }
+
+  @media (max-height:680px) and (max-width:520px){
+    .intro{display:none}
+    h1{font-size:22px}
+    .shot-desc{display:none}
+    .shot-title{min-height:2em}
+    .notice{display:none}
+    .photo{aspect-ratio:1/1.25}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="hill" aria-hidden="true"></div>
+  <header>
+    <div class="title-wrap">
+      <div class="badge">FAMILY MISSION</div>
+      <h1>우리 가족 지진 안전 3컷</h1>
+    </div>
+    <div class="shield" aria-hidden="true">★</div>
+  </header>
+
+  <div class="intro">우리 집에서 직접 찾아보고, 해보고, 사진으로 남겨요! <span class="landscape-tip">📱 휴대폰은 가로모드 권장</span></div>
+
+  <main class="shots">
+    <section class="shot" data-index="0">
+      <div class="mission"><span class="m-tag">MISSION 01</span><span class="num">1</span></div>
+      <div class="photo">
+        <img alt="안전한 곳 사진 미리보기" />
+        <div class="placeholder"><div><div class="cam-ico">📷</div>사진을 찍어주세요</div></div>
+      </div>
+      <div class="shot-title">안전한 곳을 찾아요!</div>
+      <div class="shot-desc">우리 집에서 몸을 보호할 수 있는 튼튼한 곳을 찾아봐요.</div>
+      <button class="take choose-photo" type="button">📸 사진 넣기</button><input class="gallery-input" type="file" accept="image/*"><input class="capture-input" type="file" accept="image/*" capture="environment">
+    </section>
+
+    <section class="shot" data-index="1">
+      <div class="mission"><span class="m-tag">MISSION 02</span><span class="num">2</span></div>
+      <div class="photo">
+        <img alt="몸을 보호하는 사진 미리보기" />
+        <div class="placeholder"><div><div class="cam-ico">📷</div>사진을 찍어주세요</div></div>
+      </div>
+      <div class="shot-title">몸을 안전하게 지켜요!</div>
+      <div class="shot-desc">튼튼한 책상 아래에서 머리와 몸을 보호해요.</div>
+      <button class="take choose-photo" type="button">📸 사진 넣기</button><input class="gallery-input" type="file" accept="image/*"><input class="capture-input" type="file" accept="image/*" capture="environment">
+    </section>
+
+    <section class="shot" data-index="2">
+      <div class="mission"><span class="m-tag">MISSION 03</span><span class="num">3</span></div>
+      <div class="photo">
+        <img alt="대피하는 사진 미리보기" />
+        <div class="placeholder"><div><div class="cam-ico">📷</div>사진을 찍어주세요</div></div>
+      </div>
+      <div class="shot-title">머리를 보호하며 대피해요!</div>
+      <div class="shot-desc">흔들림이 멈추면 머리를 보호하며 안전하게 이동해요.</div>
+      <button class="take choose-photo" type="button">📸 사진 넣기</button><input class="gallery-input" type="file" accept="image/*"><input class="capture-input" type="file" accept="image/*" capture="environment">
+    </section>
+  </main>
+
+  <div class="bottom">
+    <button class="action reset" id="resetBtn">↻ 다시 시작</button>
+    <div class="status" id="status">0 / 3 완료</div>
+    <button class="action save" id="saveBtn">⬇ 3컷 저장</button>
+    <div class="notice">🔒 사진은 <b>서버로 전송되지 않고</b> 이 기기에서만 사용돼요.</div>
+  </div>
+</div>
+
+
+
+<div class="sheet-backdrop" id="photoSheet" aria-hidden="true">
+  <div class="sheet" role="dialog" aria-modal="true" aria-label="사진 넣기 방법 선택">
+    <div class="sheet-title">사진을 어떻게 넣을까요?</div>
+    <div class="sheet-note" id="sheetNote">휴대폰에서는 카메라 촬영 또는 사진첩 선택을 사용할 수 있어요.</div>
+    <button class="sheet-btn sheet-camera" id="openCameraBtn" type="button">📷 카메라로 촬영</button>
+    <button class="sheet-btn sheet-gallery" id="openGalleryBtn" type="button">🖼️ 사진첩에서 선택</button>
+    <div class="sheet-help" id="sheetHelp"></div>
+    <button class="sheet-btn sheet-cancel" id="sheetCancelBtn" type="button">취소</button>
+  </div>
+</div>
+
+<div class="camera-modal" id="cameraModal" aria-hidden="true">
+  <div class="camera-top">
+    <div class="camera-title">사진 촬영</div>
+    <button class="camera-close" id="cameraCloseBtn" type="button" aria-label="카메라 닫기">×</button>
+  </div>
+  <div class="camera-stage" id="cameraStage">
+    <video id="cameraVideo" autoplay playsinline muted></video>
+    <canvas id="cameraCanvas"></canvas>
+  </div>
+  <div class="camera-controls" id="cameraControls">
+    <button class="camera-btn camera-shoot" id="shootBtn" type="button">● 촬영</button>
+    <button class="camera-btn camera-retake" id="retakeBtn" type="button">↻ 다시 찍기</button>
+    <button class="camera-btn camera-use" id="usePhotoBtn" type="button">✓ 이 사진 사용</button>
+  </div>
+  <div class="camera-hint" id="cameraHint">사진을 찍은 뒤 다시 찍거나 사용할 사진을 선택할 수 있어요.</div>
+</div>
+
+<div class="complete" id="complete">🎉 우리 가족 지진 안전 3컷 완성!<br><span style="font-weight:700">세 장을 확인한 뒤 ‘3컷 저장’을 눌러보세요.</span></div>
+
+<script>
+(() => {
+  const shots = [...document.querySelectorAll('.shot')];
+  const galleryInputs = shots.map(s => s.querySelector('.gallery-input'));
+  const captureInputs = shots.map(s => s.querySelector('.capture-input'));
+  const images = shots.map(s => s.querySelector('img'));
+  const placeholders = shots.map(s => s.querySelector('.placeholder'));
+  const chooseBtns = shots.map(s => s.querySelector('.choose-photo'));
+  const photoSheet = document.getElementById('photoSheet');
+  const openCameraBtn = document.getElementById('openCameraBtn');
+  const openGalleryBtn = document.getElementById('openGalleryBtn');
+  const sheetCancelBtn = document.getElementById('sheetCancelBtn');
+  const sheetNote = document.getElementById('sheetNote');
+  const sheetHelp = document.getElementById('sheetHelp');
+  const cameraModal = document.getElementById('cameraModal');
+  const cameraVideo = document.getElementById('cameraVideo');
+  const cameraCanvas = document.getElementById('cameraCanvas');
+  const cameraStage = document.getElementById('cameraStage');
+  const cameraControls = document.getElementById('cameraControls');
+  const cameraCloseBtn = document.getElementById('cameraCloseBtn');
+  const shootBtn = document.getElementById('shootBtn');
+  const retakeBtn = document.getElementById('retakeBtn');
+  const usePhotoBtn = document.getElementById('usePhotoBtn');
+  const cameraHint = document.getElementById('cameraHint');
+  let activeIndex = null;
+  let cameraStream = null;
+  let capturedData = null;
+  const status = document.getElementById('status');
+  const saveBtn = document.getElementById('saveBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const complete = document.getElementById('complete');
+  const data = [null,null,null];
+
+  function updateStatus(){
+    const count = data.filter(Boolean).length;
+    status.textContent = `${count} / 3 완료`;
+    if(count === 3){
+      complete.classList.add('show');
+      clearTimeout(updateStatus._t);
+      updateStatus._t = setTimeout(() => complete.classList.remove('show'), 2200);
+    }
+  }
+
+  function compressImage(file, maxSide=1600, quality=.88){
+    return new Promise((resolve,reject)=>{
+      const fr = new FileReader();
+      fr.onerror = reject;
+      fr.onload = () => {
+        const img = new Image();
+        img.onload = () => {
+          let {width:w,height:h}=img;
+          const scale = Math.min(1, maxSide / Math.max(w,h));
+          w=Math.round(w*scale); h=Math.round(h*scale);
+          const c=document.createElement('canvas'); c.width=w; c.height=h;
+          const ctx=c.getContext('2d'); ctx.drawImage(img,0,0,w,h);
+          resolve(c.toDataURL('image/jpeg',quality));
+        };
+        img.onerror = reject;
+        img.src = fr.result;
+      };
+      fr.readAsDataURL(file);
+    });
+  }
+
+  async function applyFile(file,i){
+    if(!file) return;
+    try{
+      const url = await compressImage(file);
+      setShotImage(i,url);
+    }catch(err){
+      alert('사진을 불러오지 못했어요. 다시 시도해주세요.');
+    }
+  }
+
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && Math.min(screen.width, screen.height) < 900);
+  const canUseLiveCamera = !!(window.isSecureContext && navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+
+  function refreshPhotoSheetText(){
+    if(isMobile){
+      openCameraBtn.textContent='📷 카메라로 촬영';
+      openGalleryBtn.textContent='🖼️ 사진첩에서 선택';
+      sheetNote.textContent='원하는 방법을 골라 사진을 넣어주세요.';
+      sheetHelp.textContent=canUseLiveCamera ? '카메라 촬영 후 “다시 찍기 / 이 사진 사용”을 선택할 수 있어요.' : '카메라가 바로 열리지 않으면 휴대폰 기본 촬영 화면으로 연결돼요.';
+      openCameraBtn.disabled=false;
+    }else{
+      openCameraBtn.textContent=canUseLiveCamera ? '📷 웹캠으로 촬영' : '📷 카메라 촬영';
+      openGalleryBtn.textContent='🖼️ 파일에서 선택';
+      sheetNote.textContent='PC에서는 파일 선택을 이용하거나, HTTPS로 배포한 뒤 웹캠 촬영을 사용할 수 있어요.';
+      sheetHelp.textContent=canUseLiveCamera ? '웹캠 권한을 허용하면 바로 촬영할 수 있어요.' : '현재 로컬 파일(file://)에서는 직접 촬영이 제한될 수 있어요. GitHub Pages 배포 후 다시 테스트해 주세요.';
+      openCameraBtn.disabled=!canUseLiveCamera;
+    }
+  }
+
+  function setShotImage(i,url){
+    data[i]=url;
+    images[i].src=url;
+    images[i].style.display='block';
+    placeholders[i].style.display='none';
+    chooseBtns[i].textContent='📸 사진 바꾸기';
+    updateStatus();
+  }
+
+  chooseBtns.forEach((btn,i)=>{
+    btn.addEventListener('click',()=>{
+      activeIndex=i;
+      refreshPhotoSheetText();
+      photoSheet.classList.add('show');
+      photoSheet.setAttribute('aria-hidden','false');
+    });
+  });
+
+  function closeSheet(){
+    photoSheet.classList.remove('show');
+    photoSheet.setAttribute('aria-hidden','true');
+  }
+  sheetCancelBtn.addEventListener('click',closeSheet);
+  photoSheet.addEventListener('click',e=>{ if(e.target===photoSheet) closeSheet(); });
+
+  openGalleryBtn.addEventListener('click',()=>{
+    closeSheet();
+    if(activeIndex!=null) galleryInputs[activeIndex].click();
+  });
+
+  galleryInputs.forEach((input,i)=>{
+    input.addEventListener('change',async e=>{
+      const file=e.target.files && e.target.files[0];
+      await applyFile(file,i);
+      input.value='';
+    });
+  });
+
+  captureInputs.forEach((input,i)=>{
+    input.addEventListener('change',async e=>{
+      const file=e.target.files && e.target.files[0];
+      await applyFile(file,i);
+      input.value='';
+    });
+  });
+
+  async function openCamera(){
+    closeSheet();
+    if(activeIndex==null) return;
+    capturedData=null;
+    cameraStage.classList.remove('review');
+    cameraControls.classList.remove('review');
+    cameraHint.textContent='촬영한 뒤 “다시 찍기” 또는 “이 사진 사용”을 선택할 수 있어요.';
+
+    // 실시간 카메라는 HTTPS(또는 localhost) 보안 환경에서 동작합니다.
+    if(!canUseLiveCamera){
+      if(isMobile){
+        // 모바일에서는 브라우저의 기본 카메라 촬영 UI로 연결합니다.
+        captureInputs[activeIndex].click();
+      }else{
+        alert('PC 로컬 파일에서는 카메라 촬영이 제한될 수 있어요. GitHub Pages에 올린 뒤 HTTPS 주소에서 다시 테스트해 주세요.');
+      }
+      return;
+    }
+    try{
+      cameraStream=await navigator.mediaDevices.getUserMedia({
+        video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}},
+        audio:false
+      });
+      cameraVideo.srcObject=cameraStream;
+      cameraModal.classList.add('show');
+      cameraModal.setAttribute('aria-hidden','false');
+      await cameraVideo.play();
+    }catch(err){
+      // 권한 거절 또는 장치 오류 시 모바일은 기본 촬영 화면으로 대체합니다.
+      if(isMobile){
+        captureInputs[activeIndex].click();
+      }else{
+        alert('웹캠을 열 수 없어요. 브라우저의 카메라 권한을 확인하거나 파일에서 사진을 선택해 주세요.');
+      }
+    }
+  }
+  openCameraBtn.addEventListener('click',openCamera);
+
+  function stopCamera(){
+    if(cameraStream){cameraStream.getTracks().forEach(t=>t.stop());cameraStream=null;}
+    cameraVideo.srcObject=null;
+  }
+  function closeCamera(){
+    stopCamera();
+    cameraModal.classList.remove('show');
+    cameraModal.setAttribute('aria-hidden','true');
+    cameraStage.classList.remove('review');
+    cameraControls.classList.remove('review');
+    capturedData=null;
+  }
+  cameraCloseBtn.addEventListener('click',closeCamera);
+
+  shootBtn.addEventListener('click',()=>{
+    if(!cameraVideo.videoWidth) return;
+    const vw=cameraVideo.videoWidth, vh=cameraVideo.videoHeight;
+    const maxSide=1800;
+    const scale=Math.min(1,maxSide/Math.max(vw,vh));
+    cameraCanvas.width=Math.round(vw*scale);
+    cameraCanvas.height=Math.round(vh*scale);
+    const ctx=cameraCanvas.getContext('2d');
+    ctx.drawImage(cameraVideo,0,0,cameraCanvas.width,cameraCanvas.height);
+    capturedData=cameraCanvas.toDataURL('image/jpeg',.9);
+    cameraStage.classList.add('review');
+    cameraControls.classList.add('review');
+    cameraHint.textContent='사진을 확인해 주세요.';
+  });
+
+  retakeBtn.addEventListener('click',()=>{
+    capturedData=null;
+    cameraStage.classList.remove('review');
+    cameraControls.classList.remove('review');
+    cameraHint.textContent='촬영한 뒤 “다시 찍기” 또는 “이 사진 사용”을 선택할 수 있어요.';
+  });
+
+  usePhotoBtn.addEventListener('click',()=>{
+    if(activeIndex==null || !capturedData) return;
+    setShotImage(activeIndex,capturedData);
+    closeCamera();
+  });
+
+  resetBtn.addEventListener('click',()=>{
+    if(data.some(Boolean) && !confirm('찍은 사진을 모두 지울까요?')) return;
+    data.fill(null);
+    images.forEach((img,i)=>{img.src='';img.style.display='none';placeholders[i].style.display='grid';chooseBtns[i].textContent='📸 사진 넣기';});
+    updateStatus();
+  });
+
+  const roundRect=(ctx,x,y,w,h,r,fill,stroke)=>{
+    r=Math.min(r,w/2,h/2); ctx.beginPath(); ctx.roundRect(x,y,w,h,r); if(fill){ctx.fillStyle=fill;ctx.fill();} if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=3;ctx.stroke();}
+  };
+  const drawCover=(ctx,img,x,y,w,h)=>{
+    const s=Math.max(w/img.width,h/img.height); const sw=w/s, sh=h/s; const sx=(img.width-sw)/2, sy=(img.height-sh)/2;
+    ctx.drawImage(img,sx,sy,sw,sh,x,y,w,h);
+  };
+  const loadImg=src=>new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=src;});
+
+  saveBtn.addEventListener('click', async ()=>{
+    if(document.fonts && document.fonts.ready){ await document.fonts.ready; }
+    if(data.some(v=>!v)){
+      alert('사진 3장을 모두 찍은 뒤 저장해주세요.'); return;
+    }
+    const W=1500,H=980; const c=document.createElement('canvas'); c.width=W;c.height=H; const ctx=c.getContext('2d');
+    const g=ctx.createLinearGradient(0,0,0,H); g.addColorStop(0,'#a8dcff'); g.addColorStop(.6,'#eefaff'); g.addColorStop(1,'#d9efba'); ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='rgba(255,255,255,.88)'; roundRect(ctx,55,45,W-110,110,32,'rgba(255,255,255,.88)','#d9ecfa');
+    ctx.textAlign='center'; ctx.fillStyle='#24798a'; ctx.font='60px \"Do Hyeon\", \"Noto Sans KR\", sans-serif'; ctx.fillText('우리 가족 지진 안전 3컷',W/2,118);
+
+    const titles=['안전한 곳을 찾아요!','몸을 안전하게 지켜요!','머리를 보호하며 대피해요!'];
+    const desc=['우리 집에서 몸을 보호할 수 있는 튼튼한 곳','책상 아래에서 머리와 몸을 보호해요','흔들림이 멈추면 머리를 보호하며 이동해요'];
+    const imgs=await Promise.all(data.map(loadImg));
+    const gap=28, cardW=(W-120-gap*2)/3, cardH=650, y=190;
+    for(let i=0;i<3;i++){
+      const x=60+i*(cardW+gap); roundRect(ctx,x,y,cardW,cardH,28,'#fff8e8','#4d8ed8');
+      roundRect(ctx,x+18,y+18,138,44,12,'#0f55c7'); ctx.fillStyle='#fff';ctx.font='24px \"Do Hyeon\", \"Noto Sans KR\", sans-serif';ctx.textAlign='center';ctx.fillText(`MISSION 0${i+1}`,x+87,y+48);
+      const px=x+20,py=y+80,pw=cardW-40,ph=400; ctx.save(); ctx.beginPath();ctx.roundRect(px,py,pw,ph,22);ctx.clip(); drawCover(ctx,imgs[i],px,py,pw,ph);ctx.restore();
+      ctx.fillStyle='#155177';ctx.font='31px \"Do Hyeon\", \"Noto Sans KR\", sans-serif';ctx.textAlign='center'; ctx.fillText(titles[i],x+cardW/2,y+535);
+      ctx.fillStyle='#4b6879';ctx.font='20px \"Gowun Dodum\", \"Noto Sans KR\", sans-serif'; wrapText(ctx,desc[i],x+cardW/2,y+580,cardW-50,28);
+    }
+    roundRect(ctx,180,870,W-360,70,25,'#fff1ad','#e7c75e'); ctx.fillStyle='#0f55c7';ctx.font='30px \"Do Hyeon\", \"Noto Sans KR\", sans-serif';ctx.textAlign='center';ctx.fillText('지진이 나도 배운 대로 안전하게 행동해요!',W/2,916);
+    const a=document.createElement('a'); a.download='우리_가족_지진_안전_3컷.png'; a.href=c.toDataURL('image/png'); a.click();
+  });
+
+  function wrapText(ctx,text,cx,y,maxWidth,lineHeight){
+    const chars=[...text]; let line=''; const lines=[];
+    for(const ch of chars){ const t=line+ch; if(ctx.measureText(t).width>maxWidth && line){lines.push(line);line=ch;} else line=t; }
+    if(line) lines.push(line); lines.slice(0,2).forEach((ln,idx)=>ctx.fillText(ln,cx,y+idx*lineHeight));
+  }
+
+  updateStatus();
+})();
+</script>
+</body>
+</html>
