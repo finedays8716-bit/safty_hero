@@ -179,7 +179,7 @@
     border-radius:2px;
     opacity:.98;
     will-change:transform, opacity;
-    animation:confettiRain var(--dur,2.2s) cubic-bezier(.2,.65,.35,1) var(--delay,0s) forwards;
+    animation:confettiRain var(--dur,4.2s) linear var(--delay,0s) forwards;
   }
   .confetti-piece.round{border-radius:50%;}
   .confetti-piece.thin{width:6px;height:22px;}
@@ -376,12 +376,22 @@ function playEndingSound(){
   if(!ac) return;
 
   const play=()=>{
-    // 정답음보다 한 단계 더 풍성한 짧은 '히어로 완성!' 팡파르
-    tone(523.25,0.00,0.18,0.060,'sine');   // C5
-    tone(659.25,0.13,0.18,0.065,'sine');   // E5
-    tone(783.99,0.26,0.20,0.070,'sine');   // G5
-    tone(1046.50,0.42,0.42,0.080,'triangle'); // C6
-    tone(783.99,0.42,0.42,0.035,'sine');   // G5 화음
+    // '히어로 완성!' 느낌의 밝은 팡파르 — 짜라란! + 마지막 화음
+    tone(523.25,0.00,0.16,0.060,'triangle');  // C5
+    tone(659.25,0.12,0.16,0.065,'triangle');  // E5
+    tone(783.99,0.24,0.18,0.070,'triangle');  // G5
+    tone(1046.50,0.38,0.22,0.075,'triangle'); // C6
+
+    // 한 번 더 위로 올라가는 축하 멜로디
+    tone(1174.66,0.58,0.15,0.060,'sine');     // D6
+    tone(1318.51,0.70,0.16,0.065,'sine');     // E6
+    tone(1567.98,0.84,0.18,0.070,'sine');     // G6
+
+    // 마지막 '짜잔!' 화음
+    tone(1046.50,1.02,0.58,0.080,'triangle'); // C6
+    tone(1318.51,1.02,0.58,0.055,'sine');     // E6
+    tone(1567.98,1.02,0.58,0.055,'sine');     // G6
+    tone(2093.00,1.08,0.36,0.035,'sine');     // C7 반짝임
   };
 
   if(ac.state==='suspended'){
@@ -442,8 +452,8 @@ function launchConfetti(count=100){
 
     p.style.left=(Math.random()*100)+'vw';
     p.style.background=colors[Math.floor(Math.random()*colors.length)];
-    p.style.setProperty('--delay',(Math.random()*.55)+'s');
-    p.style.setProperty('--dur',(1.65+Math.random()*1.45)+'s');
+    p.style.setProperty('--delay',(Math.random()*1.05)+'s');
+    p.style.setProperty('--dur',(3.4+Math.random()*2.0)+'s');
     p.style.setProperty('--drift',(-130+Math.random()*260)+'px');
     p.style.setProperty('--spin',((Math.random()>.5?1:-1)*(540+Math.random()*1080))+'deg');
 
@@ -451,7 +461,7 @@ function launchConfetti(count=100){
   }
 
   document.body.appendChild(overlay);
-  setTimeout(()=>overlay.remove(),3900);
+  setTimeout(()=>overlay.remove(),6800);
 }
 
 /* ===================== 상태 ===================== */
@@ -625,7 +635,7 @@ function renderEnding(){
         </div>
       </div>
     </div>`;
-  requestAnimationFrame(()=>launchConfetti(150));
+  requestAnimationFrame(()=>launchConfetti(180));
 }
 /* 엔딩 떠날 때 배경 원복용 플래그 해제 */
 function endReset(){ document.body.classList.remove('ending-bg'); }
