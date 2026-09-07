@@ -162,6 +162,33 @@
   }
   /* 엔딩일 때: 카드 배경 투명하게 해서 그림이 화면 가득 보이게 */
   body.ending-bg .game{background:transparent;border:none;box-shadow:none;max-width:100%;padding:0;}
+
+  /* ===== 정답/엔딩 대량 색종이가루 효과 ===== */
+  .confetti-overlay{
+    position:fixed;
+    inset:0;
+    z-index:99999;
+    pointer-events:none;
+    overflow:hidden;
+  }
+  .confetti-piece{
+    position:absolute;
+    top:-12vh;
+    width:10px;
+    height:18px;
+    border-radius:2px;
+    opacity:.98;
+    will-change:transform, opacity;
+    animation:confettiRain var(--dur,2.2s) cubic-bezier(.2,.65,.35,1) var(--delay,0s) forwards;
+  }
+  .confetti-piece.round{border-radius:50%;}
+  .confetti-piece.thin{width:6px;height:22px;}
+  @keyframes confettiRain{
+    0%{transform:translate3d(0,-10vh,0) rotate(0deg);opacity:0;}
+    8%{opacity:1;}
+    100%{transform:translate3d(var(--drift,0px),115vh,0) rotate(var(--spin,720deg));opacity:.95;}
+  }
+
 </style>
 </head>
 <body class="t-home">
@@ -235,7 +262,7 @@ const THEMES={
     name:"지진", emoji:"🌍", heroName:"스토니", hero:"🦸",
     color:"#b78b4e", colorD:"#97703a", bodyClass:"t-quake", prefix:"quake",
     recap:"탁자 밑 → 가방으로 머리 막고 문열기 → 신발 → 넓은 곳",
-    ending:"스토니는 머리를 지키고 침착하게 대피한 멋진 지진 히어로예요! 모두 안전해요!",
+    ending:"스토니는 배운 대로 몸을 보호하고 안전하게 대피했어요! 모두 무사해요!",
     intro:{ story:"스토니와 친구들이 교실에서 도란도란 그림을 그리고 있어요. 참 평화로운 날이에요. 그런데… 어? 갑자기 땅이 흔들리기 시작했어요!",
       hero:"🦸", extra:"🎨🧒", phLabel:"평화로운 교실, 그림 그리는 스토니와 친구들" },
     scenes:[
@@ -274,13 +301,13 @@ const THEMES={
     recap:"알리미 확인 → 마스크 → 코 밀착 → 창문 닫기 → 손·얼굴 씻기 → 물 마시기",
     ending:"파인은 마스크도 잘 쓰고 깨끗이 씻은 멋진 미세먼지 히어로예요! 오늘도 건강하게 하루를 보냈어요!",
     intro:{ story:"파인과 친구들이 창밖을 내다봐요. 어제는 하늘이 파랬는데… 오늘은 어쩐지 뿌옇고 회색이에요. 무슨 일일까요?",
-      hero:"🦸‍♂️", extra:"🪟🧒", phLabel:"창밖을 보는 파인과 친구들, 뿌연 하늘" },
+      hero:"🦸‍♂️", extra:"🌫️🧒", phLabel:"창밖을 보는 파인과 친구들, 뿌연 하늘" },
     scenes:[
       { qStory:"창밖 하늘이 뿌옇고 회색이에요. 벽에 붙은 미세먼지 알리미가 빨간색으로 반짝여요!",
         hero:"🦸‍♂️", extra:"🔴", extraPos:{top:"20px",right:"30px"}, phLabel:"뿌연 창밖 + 빨강 알리미",
         correct:{emo:"🏠", label:"밖에 나가지 않고 실내에서 논다"},
         wrong:[{emo:"🌳",label:"신나게 놀이터로 뛰어나간다",fb:"먼지 괴물이 많은 날은 집 안에서 노는 게 가장 안전해요!"},
-               {emo:"🪟",label:"시원하게 창문을 활짝 연다",fb:"창문을 열면 먼지 괴물이 들어와요! 오늘은 닫아둬요."}],
+               {emo:"💨",label:"시원하게 창문을 활짝 연다",fb:"창문을 열면 먼지 괴물이 들어와요! 오늘은 닫아둬요."}],
         aStory:"파인은 <b>밖에 나가지 않고 교실 안에서 놀기로 했어요.</b> 먼지 괴물을 피하는 똑똑한 선택이에요!",
         aHero:"🦸‍♂️", aExtra:"🏠" },
       { qStory:"그래도 잠깐 밖에 나가야 할 일이 생겼어요. 회색 먼지가 둥둥 떠다녀요.",
@@ -297,9 +324,9 @@ const THEMES={
         aStory:"파인은 <b>코 부분 철사를 손가락으로 꾹 눌렀어요.</b> 빈틈없이 딱 붙어 먼지가 못 들어와요!",
         aHero:"🦸‍♂️", aExtra:"🤏" },
       { qStory:"집에 돌아왔어요. 창문이 활짝 열려 있어서 회색 먼지가 솔솔 들어와요!",
-        hero:"🦸‍♂️", extra:"🪟", extraPos:{top:"20px",right:"30px"}, phLabel:"열린 창문 + 들어오는 먼지",
+        hero:"🦸‍♂️", extra:"💨", extraPos:{top:"20px",right:"30px"}, phLabel:"열린 창문 + 들어오는 먼지",
         correct:{emo:"🚪", label:"창문을 꽉 닫는다"},
-        wrong:[{emo:"🪟",label:"바람 쐬려고 창문을 연다",fb:"미세먼지가 심할 땐 창문을 닫아야 집 안 공기를 지켜요!"}],
+        wrong:[{emo:"💨",label:"바람 쐬려고 창문을 연다",fb:"미세먼지가 심할 땐 창문을 닫아야 집 안 공기를 지켜요!"}],
         aStory:"파인은 <b>창문을 꽉 닫았어요.</b> 집 안 공기를 깨끗하게 지켰어요!",
         aHero:"🦸‍♂️", aExtra:"🚪" },
       { qStory:"밖에서 놀다 왔더니 손과 얼굴에 보이지 않는 먼지가 잔뜩 묻었어요.",
@@ -344,9 +371,87 @@ function playCorrectSound(){
   tone(659.25,0.11,0.18,0.060,'sine');
   tone(783.99,0.23,0.24,0.065,'sine');
 }
+function playEndingSound(){
+  const ac=getAudioCtx();
+  if(!ac) return;
+
+  const play=()=>{
+    // 정답음보다 한 단계 더 풍성한 짧은 '히어로 완성!' 팡파르
+    tone(523.25,0.00,0.18,0.060,'sine');   // C5
+    tone(659.25,0.13,0.18,0.065,'sine');   // E5
+    tone(783.99,0.26,0.20,0.070,'sine');   // G5
+    tone(1046.50,0.42,0.42,0.080,'triangle'); // C6
+    tone(783.99,0.42,0.42,0.035,'sine');   // G5 화음
+  };
+
+  if(ac.state==='suspended'){
+    ac.resume().then(play).catch(()=>{});
+  }else{
+    play();
+  }
+}
+
 function playWrongSound(){
-  tone(220,0.00,0.12,0.045,'triangle');
-  tone(174.61,0.10,0.16,0.040,'triangle');
+  const ac=getAudioCtx();
+  if(!ac) return;
+
+  const play=()=>{
+    const now=ac.currentTime;
+
+    // 짧고 분명한 '뿌웅↘' 느낌의 오답음
+    const o=ac.createOscillator();
+    const g=ac.createGain();
+
+    o.type='square';
+    o.frequency.setValueAtTime(330,now);
+    o.frequency.exponentialRampToValueAtTime(180,now+0.30);
+
+    g.gain.setValueAtTime(0.0001,now);
+    g.gain.exponentialRampToValueAtTime(0.11,now+0.015);
+    g.gain.exponentialRampToValueAtTime(0.0001,now+0.34);
+
+    o.connect(g);
+    g.connect(ac.destination);
+    o.start(now);
+    o.stop(now+0.36);
+  };
+
+  // 모바일 브라우저에서 AudioContext가 잠들어 있어도 클릭 직후 확실히 재생
+  if(ac.state==='suspended'){
+    ac.resume().then(play).catch(()=>{});
+  }else{
+    play();
+  }
+}
+
+
+/* ===================== 화면 최상단 색종이가루 ===================== */
+function launchConfetti(count=100){
+  const old=document.querySelector('.confetti-overlay');
+  if(old) old.remove();
+
+  const overlay=document.createElement('div');
+  overlay.className='confetti-overlay';
+  const colors=['#ff4d6d','#ff8a00','#ffd43b','#51cf66','#22b8cf','#4c6ef5','#845ef7','#f06595'];
+
+  for(let i=0;i<count;i++){
+    const p=document.createElement('i');
+    p.className='confetti-piece';
+    if(i%5===0) p.classList.add('round');
+    if(i%7===0) p.classList.add('thin');
+
+    p.style.left=(Math.random()*100)+'vw';
+    p.style.background=colors[Math.floor(Math.random()*colors.length)];
+    p.style.setProperty('--delay',(Math.random()*.55)+'s');
+    p.style.setProperty('--dur',(1.65+Math.random()*1.45)+'s');
+    p.style.setProperty('--drift',(-130+Math.random()*260)+'px');
+    p.style.setProperty('--spin',((Math.random()>.5?1:-1)*(540+Math.random()*1080))+'deg');
+
+    overlay.appendChild(p);
+  }
+
+  document.body.appendChild(overlay);
+  setTimeout(()=>overlay.remove(),3900);
 }
 
 /* ===================== 상태 ===================== */
@@ -481,10 +586,8 @@ function renderAnswer(){
   const num=String(idx+1).padStart(2,'0');
   const aImg=`${T.prefix}_${num}_a.webp`;
   const last=s.isFinal;
-  const correctFx=['🎉','✨','🎊','⭐','🎈','💫'].map((c,i)=>`<span class="confetti" style="left:${8+i*16}%;animation-delay:${i*.18}s">${c}</span>`).join('');
   game.innerHTML=`
     ${topbarHTML(T)}
-    ${correctFx}
     <div class="stage answer" style="background:linear-gradient(180deg,#fff7d6,#ffe9a8)">
       <span class="ph-label">🖼 ${aImg} — 정답 장면</span>
       <div style="position:absolute;left:16px;top:16px;z-index:6;background:#ff7a00;color:#fff;border-radius:999px;padding:8px 14px;font-family:'CookieRun';font-size:18px;box-shadow:0 4px 0 #d85f00;">정답! 🎉</div>
@@ -497,19 +600,20 @@ function renderAnswer(){
       <button class="prev-btn" onclick="prevStep()">◀ 이전</button>
       <button class="next-btn" onclick="${last?'renderEnding()':'nextQuestion()'}">${last?'🏅 끝까지 해냈어요!':'다음 이야기 ▶'}</button>
     </div>`;
+  requestAnimationFrame(()=>launchConfetti(110));
 }
 function nextQuestion(){idx++;renderQuestion();}
 function prevStep(){ if(idx<=0){ renderIntro(); } else { idx--; renderQuestion(); } }
 
 /* ===================== 엔딩 ===================== */
 function renderEnding(){
+  playEndingSound();
   const T=THEMES[curKey];
   const endImg=`${T.prefix}_ending.webp`;
   // 엔딩 그림을 화면 전체 배경으로
   document.body.style.backgroundImage=`url('${IMG_PATH}${endImg}')`;setBg();
   document.body.classList.add('ending-bg');
-  const conf=['🎊','✨','🎉','⭐','🎈'].map((c,i)=>`<span class="confetti" style="left:${10+i*18}%;animation-delay:${i*.4}s">${c}</span>`).join('');
-  game.innerHTML=`${conf}
+  game.innerHTML=`
     <div class="ending">
       <div class="end-card">
         <div class="medal-sm">🏅</div>
@@ -521,6 +625,7 @@ function renderEnding(){
         </div>
       </div>
     </div>`;
+  requestAnimationFrame(()=>launchConfetti(150));
 }
 /* 엔딩 떠날 때 배경 원복용 플래그 해제 */
 function endReset(){ document.body.classList.remove('ending-bg'); }
