@@ -174,11 +174,11 @@
    음성 없음 / 정답 선택지 위치 셔플
 
    [이미지 파일명] HTML과 같은 폴더에 두면 자동 표시 (없으면 이모지)
-   - 배경: bg_home.png / bg_fire.png / bg_quake.png / bg_dust.png
-   - 문제: fire_01_q.png ~   (quake_, dust_ 동일)
-   - 정답: fire_01_a.png ~   (정답화면에 크게 표시)
+   - 배경: bg_home.webp / bg_fire.webp / bg_quake.webp / bg_dust.webp
+   - 문제: fire_01_q.webp ~   (quake_, dust_ 동일)
+   - 정답: fire_01_a.webp ~   (정답화면에 크게 표시)
    ========================================================= */
-const IMG_PATH="img/"; // 이미지 파일은 저장소의 img 폴더에 둡니다
+const IMG_PATH="img/"; // 이미지 파일은 img 폴더에서 불러옵니다
 
 const THEMES={
   fire:{
@@ -333,23 +333,23 @@ function setBg(){
 }
 function renderHome(){
   document.body.className='t-home';
-  document.body.style.backgroundImage=`url('${IMG_PATH}bg_home.png')`;setBg();
+  document.body.style.backgroundImage='none';setBg();
   game.innerHTML=`<div class="home">
     <h1>히어로 친구들과 함께<br>안전하게 대피하는 방법을 배워요!</h1>
 
     <div class="char-intro">
       <div class="char-card">
-        <div class="char-face cf-fire"><img src="${IMG_PATH}face_luna.png" alt="" onerror="this.parentNode.textContent='🦸‍♀️'"></div>
+        <div class="char-face cf-fire"><img src="${IMG_PATH}face_luna.webp" alt="" onerror="this.parentNode.textContent='🦸‍♀️'"></div>
         <div class="char-text"><div class="nm">루나 🔥</div>
           <div class="ro">불이 났을 때 안전하게 대피하는 방법을 알려줘요</div></div>
       </div>
       <div class="char-card">
-        <div class="char-face cf-quake"><img src="${IMG_PATH}face_stony.png" alt="" onerror="this.parentNode.textContent='🦸'"></div>
+        <div class="char-face cf-quake"><img src="${IMG_PATH}face_stony.webp" alt="" onerror="this.parentNode.textContent='🦸'"></div>
         <div class="char-text"><div class="nm">스토니 🌍</div>
           <div class="ro">지진이 났을 때 몸을 안전하게 지키는 방법을 알려줘요</div></div>
       </div>
       <div class="char-card">
-        <div class="char-face cf-dust"><img src="${IMG_PATH}face_pine.png" alt="" onerror="this.parentNode.textContent='🦸‍♂️'"></div>
+        <div class="char-face cf-dust"><img src="${IMG_PATH}face_pine.webp" alt="" onerror="this.parentNode.textContent='🦸‍♂️'"></div>
         <div class="char-text"><div class="nm">파인 😷</div>
           <div class="ro">미세먼지가 심한 날 건강을 지키는 방법을 알려줘요</div></div>
       </div>
@@ -372,8 +372,8 @@ function startTheme(k){curKey=k;idx=0;renderIntro();}
 function renderIntro(){
   const T=THEMES[curKey], it=T.intro;
   document.body.className=T.bodyClass;
-  document.body.style.backgroundImage=`url('${IMG_PATH}bg_${T.prefix}.png')`;setBg();
-  const introImg=`${T.prefix}_00_intro.png`;
+  document.body.style.backgroundImage=`url('${IMG_PATH}bg_${T.prefix}.webp')`;setBg();
+  const introImg=`${T.prefix}_00_intro.webp`;
   game.innerHTML=`
     <div class="topbar">
       <button class="home-btn" onclick="renderHome()">🏠 처음</button>
@@ -405,9 +405,9 @@ function topbarHTML(T){
 function renderQuestion(){
   const T=THEMES[curKey], s=T.scenes[idx];
   document.body.className=T.bodyClass;
-  document.body.style.backgroundImage=`url('${IMG_PATH}bg_${T.prefix}.png')`;setBg();
+  document.body.style.backgroundImage=`url('${IMG_PATH}bg_${T.prefix}.webp')`;setBg();
   const num=String(idx+1).padStart(2,'0');
-  const qImg=`${T.prefix}_${num}_q.png`;
+  const qImg=`${T.prefix}_${num}_q.webp`;
   const ex=s.extraPos?Object.entries(s.extraPos).map(([k,v])=>`${k}:${v}`).join(';'):'';
 
   curChoices=shuffle([{...s.correct,correct:true}, ...s.wrong.map(w=>({...w,correct:false}))]);
@@ -447,7 +447,7 @@ function closePopup(){document.getElementById('popup').classList.remove('show');
 function renderAnswer(){
   const T=THEMES[curKey], s=T.scenes[idx];
   const num=String(idx+1).padStart(2,'0');
-  const aImg=`${T.prefix}_${num}_a.png`;
+  const aImg=`${T.prefix}_${num}_a.webp`;
   const last=s.isFinal;
   game.innerHTML=`
     ${topbarHTML(T)}
@@ -469,7 +469,7 @@ function prevStep(){ if(idx<=0){ renderIntro(); } else { idx--; renderQuestion()
 /* ===================== 엔딩 ===================== */
 function renderEnding(){
   const T=THEMES[curKey];
-  const endImg=`${T.prefix}_ending.png`;
+  const endImg=`${T.prefix}_ending.webp`;
   // 엔딩 그림을 화면 전체 배경으로
   document.body.style.backgroundImage=`url('${IMG_PATH}${endImg}')`;setBg();
   document.body.classList.add('ending-bg');
